@@ -1,4 +1,5 @@
-# FORESIGHT - Demand & Inventory Intelligence
+Invalid username or token
+Password authentication is not supported# FORESIGHT - Demand & Inventory Intelligence
 
 FORESIGHT is an explainable demand forecasting and inventory decision-support MVP for NorthBay Living. It uses the supplied synthetic two-year, 200-SKU, one-warehouse dataset.
 
