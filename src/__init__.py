@@ -1,0 +1,1 @@
+"""Reusable FORESIGHT data, forecasting, and risk logic."""
