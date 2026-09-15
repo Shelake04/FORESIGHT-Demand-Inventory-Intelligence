@@ -1,11 +1,17 @@
 """Streamlit operations view over precomputed FORESIGHT outputs."""
 
 from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import generate_data
+from run_pipeline import main as build_outputs
 
-ROOT = Path(__file__).resolve().parents[1]
 st.set_page_config(page_title="FORESIGHT", layout="wide")
 st.title("FORESIGHT")
 st.caption("Demand & Inventory Intelligence | NorthBay Living")
@@ -16,11 +22,18 @@ def load_outputs():
             pd.read_csv(ROOT / "data/processed/forecasts.csv", parse_dates=["forecast_week"]),
             pd.read_csv(ROOT / "data/processed/weekly_demand_features.csv", parse_dates=["week_start"]))
 
-try:
-    decisions, forecasts, weekly = load_outputs()
-except FileNotFoundError:
-    st.error("Processed outputs are missing. Run `python run_pipeline.py` from the project root.")
-    st.stop()
+processed_files = [
+    ROOT / "data/processed/inventory_decisions.csv",
+    ROOT / "data/processed/forecasts.csv",
+    ROOT / "data/processed/weekly_demand_features.csv",
+]
+
+if not all(path.exists() for path in processed_files):
+    with st.spinner("Preparing FORESIGHT data..."):
+        generate_data.main()
+        build_outputs()
+
+decisions, forecasts, weekly = load_outputs()
 
 categories = st.sidebar.multiselect("Category", sorted(decisions.category.unique()), default=sorted(decisions.category.unique()))
 actions = st.sidebar.multiselect("Action", sorted(decisions.recommended_action.unique()), default=sorted(decisions.recommended_action.unique()))
